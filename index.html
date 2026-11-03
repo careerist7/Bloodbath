@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台股韭菜續命時段 - 2026最新打折地圖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .neon-green {
+            text-shadow: 0 0 10px #22c55e, 0 0 20px #22c55e;
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 min-h-screen p-4 md:p-8 font-sans text-gray-800">
+
+    <header class="text-center mb-10">
+        <h1 class="text-4xl md:text-5xl font-bold text-teal-800 mb-3 tracking-wider">台股韭菜續命時段 📉</h1>
+        <p class="text-gray-600">2026 全台超商/超市打折即時狀態 (支援萬家福、大全聯)</p>
+    </header>
+
+    <div id="store-grid" class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 卡片會由 JavaScript 動態生成 -->
+    </div>
+
+    <script>
+        const stores = [
+            { name: "7-11 (i珍食)", discount: "65折", emoji: "🏪", times: [{start: 10, end: 17}, {start: 20, end: 3, nextDay: true}] },
+            { name: "全家 (友善食光)", discount: "7折", emoji: "🍦", times: [{start: 10, end: 17}, {start: 17, end: 24}] },
+            { name: "萊爾富 (即食救援)", discount: "7折", emoji: "💖", times: [{start: 17, end: 24}] },
+            { name: "OK超商 (OKmart)", discount: "6折", emoji: "👌", times: [{start: 16.5, end: 22.5}] },
+            { name: "全聯 (幸福餐盒/鮮食)", discount: "6折", emoji: "🛒", times: [{start: 13, end: 14}, {start: 19, end: 20}] },
+            { name: "大全聯 (原大潤發)", discount: "下殺5折起", emoji: "🏢", times: [{start: 13, end: 14}, {start: 18, end: 22}] },
+            { name: "萬家福 (原家樂福)", discount: "下殺5折起", emoji: "🛍️", times: [{start: 13, end: 14.5}, {start: 17, end: 21}] },
+            { name: "星巴克 (珍食計畫)", discount: "7折", emoji: "☕", times: [{start: 19, end: 22.5}] },
+            { name: "義美食品", discount: "5折", emoji: "🍰", times: [{start: 21, end: 22.5}] },
+            { name: "爭鮮外帶壽司", discount: "買1送1", emoji: "🍣", times: [{start: 21, end: 22}] }
+        ];
+
+        function checkTime() {
+            const now = new Date();
+            const currentHour = now.getHours() + now.getMinutes() / 60;
+            const grid = document.getElementById('store-grid');
+            grid.innerHTML = '';
+
+            stores.forEach(store => {
+                let isActive = false;
+                
+                store.times.forEach(t => {
+                    if (t.nextDay) {
+                        if (currentHour >= t.start || currentHour < t.end) isActive = true;
+                    } else {
+                        if (currentHour >= t.start && currentHour < t.end) isActive = true;
+                    }
+                });
+
+                const statusHtml = isActive 
+                    ? `<div class="mt-4 px-4 py-2 bg-green-500 rounded-lg text-center font-bold text-xl neon-green animate-pulse">🟢 特價中！ (${store.discount})</div>`
+                    : `<div class="mt-4 px-4 py-2 bg-gray-200 text-gray-500 rounded-lg text-center font-bold text-lg">🔴 尚未開始</div>`;
+
+                const timeText = store.times.map(t => {
+                    const format = h => `${Math.floor(h).toString().padStart(2,'0')}:${(h%1*60).toString().padStart(2,'0')}`;
+                    return `${format(t.start)} - ${t.nextDay ? '隔日' : ''}${format(t.end)}`;
+                }).join(' & ');
+
+                grid.innerHTML += `
+                    <div class="glass-card rounded-2xl p-6 transition-transform hover:scale-[1.02]">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="text-4xl">${store.emoji}</div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">${store.name}</h2>
+                                <p class="text-sm text-gray-600 font-medium mt-1">時段：${timeText}</p>
+                            </div>
+                        </div>
+                        ${statusHtml}
+                    </div>
+                `;
+            });
+        }
+
+        setInterval(checkTime, 1000);
+        checkTime();
+    </script>
+</body>
+</html>
