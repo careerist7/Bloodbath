@@ -51,12 +51,9 @@
         <p class="text-gray-600 font-medium">2026 全台打折即時倒數</p>
     </header>
 
-    <div id="store-grid" class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- 卡片會由 JavaScript 動態生成 -->
-    </div>
+    <div id="store-grid" class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6"></div>
 
     <script>
-        // 品牌資料：已全數更新為穩定的純 SVG 原檔網址
         const stores = [
             { name: "7-11 (i珍食)", discount: "65折", logo: "https://upload.wikimedia.org/wikipedia/commons/4/40/7-eleven_logo.svg", times: [{start: 10, end: 17}, {start: 20, end: 3, nextDay: true}] },
             { name: "全家 (友善食光)", discount: "7折", logo: "https://upload.wikimedia.org/wikipedia/commons/3/31/FamilyMart_Logo_%282016-%29.svg", times: [{start: 10, end: 17}, {start: 17, end: 24}] },
@@ -97,13 +94,21 @@
                     endToday.setDate(endToday.getDate() + 1);
                 }
 
+                // 昨天
                 let startYesterday = new Date(startToday);
                 startYesterday.setDate(startYesterday.getDate() - 1);
                 let endYesterday = new Date(endToday);
                 endYesterday.setDate(endYesterday.getDate() - 1);
 
+                // 明天 (確保超過今天最後時段後，還能抓到明天的倒數)
+                let startTomorrow = new Date(startToday);
+                startTomorrow.setDate(startTomorrow.getDate() + 1);
+                let endTomorrow = new Date(endToday);
+                endTomorrow.setDate(endTomorrow.getDate() + 1);
+
                 events.push({ start: startYesterday, end: endYesterday });
                 events.push({ start: startToday, end: endToday });
+                events.push({ start: startTomorrow, end: endTomorrow });
             });
 
             let activeEvent = events.find(e => now >= e.start && now < e.end);
@@ -115,21 +120,22 @@
             if (futureEvents.length > 0) {
                 return { isActive: false, targetTime: futureEvents[0].start };
             }
-            return { isActive: false, targetTime: null };
+            return { isActive: false, targetTime: new Date() }; // Fallback
         }
 
-        // 圖片載入失敗時的防破圖替換機制
         function handleImageError(imgElement, storeName) {
             const firstChar = storeName.substring(0, 1);
             imgElement.outerHTML = `<div class="fallback-logo">${firstChar}</div>`;
         }
 
+        let isInitialized = false;
+
         function renderGrid() {
             const grid = document.getElementById('store-grid');
             const now = new Date();
             
-            // 只有在第一次載入時重繪整個 HTML，避免倒數計時閃爍與圖片重複請求
-            if (grid.innerHTML.trim() === '') {
+            // 確保只在第一次載入時產生 HTML 結構，解決閃爍與重疊問題
+            if (!isInitialized) {
                 let htmlStr = '';
                 stores.forEach((store, index) => {
                     const timeText = store.times.map(t => {
@@ -151,22 +157,25 @@
                     `;
                 });
                 grid.innerHTML = htmlStr;
+                isInitialized = true;
             }
 
-            // 單獨更新狀態區塊的倒數文字，提升效能並解決閃爍
+            // 每秒只更新狀態區塊的文字
             stores.forEach((store, index) => {
                 const status = getStoreStatus(store, now);
                 const statusContainer = document.getElementById(`status-${index}`);
                 
+                if (!statusContainer) return;
+
+                let timeLeft = status.targetTime - now;
+                
                 if (status.isActive) {
-                    let timeLeft = status.targetTime - now;
                     statusContainer.innerHTML = `
                         <div class="mt-4 px-4 py-3 bg-green-500 rounded-lg text-center shadow-inner">
                             <div class="font-bold text-xl neon-green">🟢 特價中！ (${store.discount})</div>
                             <div class="text-green-100 font-mono text-lg mt-1 tracking-wider">結束倒數 ${formatCountdown(timeLeft)}</div>
                         </div>`;
                 } else {
-                    let timeLeft = status.targetTime - now;
                     statusContainer.innerHTML = `
                         <div class="mt-4 px-4 py-3 bg-gray-200 text-gray-600 rounded-lg text-center">
                             <div class="font-bold text-lg">🔴 尚未開始</div>
