@@ -25,6 +25,22 @@
             border-radius: 12px;
             padding: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+        .fallback-logo {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            color: #4b5563;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -32,7 +48,7 @@
 
     <header class="text-center mb-10">
         <h1 class="text-4xl md:text-5xl font-bold text-teal-800 mb-3 tracking-wider">台股韭菜續命時段 📉</h1>
-        <p class="text-gray-600 font-medium">2026 全台打折即時倒數</p>
+        <p class="text-gray-600 font-medium">2026 全台打折即時倒數 (支援萬家福、大全聯)</p>
     </header>
 
     <div id="store-grid" class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -40,28 +56,26 @@
     </div>
 
     <script>
-        // 品牌資料與時段設定，logo皆採用穩定圖源
+        // 品牌資料：已全數更新為穩定的純 SVG 原檔網址
         const stores = [
             { name: "7-11 (i珍食)", discount: "65折", logo: "https://upload.wikimedia.org/wikipedia/commons/4/40/7-eleven_logo.svg", times: [{start: 10, end: 17}, {start: 20, end: 3, nextDay: true}] },
-            { name: "全家 (友善食光)", discount: "7折", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/FamilyMart_Logo_%282016-%29.svg/512px-FamilyMart_Logo_%282016-%29.svg.png", times: [{start: 10, end: 17}, {start: 17, end: 24}] },
-            { name: "萊爾富 (即食救援)", discount: "7折", logo: "https://upload.wikimedia.org/wikipedia/zh/thumb/1/1c/Hi-Life_logo.svg/512px-Hi-Life_logo.svg.png", times: [{start: 17, end: 24}] },
-            { name: "OK超商", discount: "6折", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/OK_Mart_logo.svg/512px-OK_Mart_logo.svg.png", times: [{start: 16.5, end: 22.5}] },
-            { name: "全聯 (幸福餐盒)", discount: "6折", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/PX_Mart_logo_%282015%29.svg/512px-PX_Mart_logo_%282015%29.svg.png", times: [{start: 13, end: 14}, {start: 19, end: 20}] },
-            { name: "大全聯 (原大潤發)", discount: "下殺5折起", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/RT-Mart_Logo.svg/512px-RT-Mart_Logo.svg.png", times: [{start: 13, end: 14}, {start: 18, end: 22}] },
-            { name: "萬家福 (原家樂福)", discount: "下殺5折起", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Carrefour_logo.svg/512px-Carrefour_logo.svg.png", times: [{start: 13, end: 14.5}, {start: 17, end: 21}] },
-            { name: "星巴克 (珍食計畫)", discount: "7折", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/512px-Starbucks_Corporation_Logo_2011.svg.png", times: [{start: 19, end: 22.5}] },
-            { name: "義美食品", discount: "5折", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/I-MEI_Foods_logo.svg/512px-I-MEI_Foods_logo.svg.png", times: [{start: 21, end: 22.5}] },
-            { name: "爭鮮外帶壽司", discount: "買1送1", logo: "https://upload.wikimedia.org/wikipedia/zh/thumb/0/0c/Sushi_Express_logo.svg/512px-Sushi_Express_logo.svg.png", times: [{start: 21, end: 22}] }
+            { name: "全家 (友善食光)", discount: "7折", logo: "https://upload.wikimedia.org/wikipedia/commons/3/31/FamilyMart_Logo_%282016-%29.svg", times: [{start: 10, end: 17}, {start: 17, end: 24}] },
+            { name: "萊爾富 (即食救援)", discount: "7折", logo: "https://upload.wikimedia.org/wikipedia/zh/1/1c/Hi-Life_logo.svg", times: [{start: 17, end: 24}] },
+            { name: "OK超商", discount: "6折", logo: "https://upload.wikimedia.org/wikipedia/commons/c/cd/OK_Mart_logo.svg", times: [{start: 16.5, end: 22.5}] },
+            { name: "全聯 (幸福餐盒)", discount: "6折", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6d/PX_Mart_logo_%282015%29.svg", times: [{start: 13, end: 14}, {start: 19, end: 20}] },
+            { name: "大全聯 (原大潤發)", discount: "下殺5折起", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c2/RT-Mart_Logo.svg", times: [{start: 13, end: 14}, {start: 18, end: 22}] },
+            { name: "萬家福 (原家樂福)", discount: "下殺5折起", logo: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Carrefour_logo.svg", times: [{start: 13, end: 14.5}, {start: 17, end: 21}] },
+            { name: "星巴克 (珍食計畫)", discount: "7折", logo: "https://upload.wikimedia.org/wikipedia/en/d/d3/Starbucks_Corporation_Logo_2011.svg", times: [{start: 19, end: 22.5}] },
+            { name: "義美食品", discount: "5折", logo: "https://upload.wikimedia.org/wikipedia/commons/c/cd/I-MEI_Foods_logo.svg", times: [{start: 21, end: 22.5}] },
+            { name: "爭鮮外帶壽司", discount: "買1送1", logo: "https://upload.wikimedia.org/wikipedia/zh/0/0c/Sushi_Express_logo.svg", times: [{start: 21, end: 22}] }
         ];
 
-        // 將小數小時轉換為 [時, 分] (例如 16.5 -> 16:30)
         function hourToTimeObj(h) {
             let hr = Math.floor(h);
             let min = Math.round((h % 1) * 60);
             return { hr, min };
         }
 
-        // 格式化時間倒數 HH:MM:SS
         function formatCountdown(ms) {
             let totalSeconds = Math.floor(ms / 1000);
             let h = Math.floor(totalSeconds / 3600);
@@ -70,11 +84,8 @@
             return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        // 取得該店家的下一個狀態（特價中 or 等待中）與目標倒數時間
         function getStoreStatus(store, now) {
             let events = [];
-            
-            // 建立今天與昨天的所有可能時段（處理跨夜如 20:00 - 03:00）
             store.times.forEach(t => {
                 let startObj = hourToTimeObj(t.start);
                 let endObj = hourToTimeObj(t.end);
@@ -82,12 +93,10 @@
                 let startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startObj.hr, startObj.min, 0);
                 let endToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endObj.hr, endObj.min, 0);
                 
-                // 如果結束時間小於開始時間，代表跨日
                 if (t.nextDay || t.end <= t.start) {
                     endToday.setDate(endToday.getDate() + 1);
                 }
 
-                // 產生昨天的時段（如果今天凌晨剛好在昨天的時段內）
                 let startYesterday = new Date(startToday);
                 startYesterday.setDate(startYesterday.getDate() - 1);
                 let endYesterday = new Date(endToday);
@@ -97,13 +106,11 @@
                 events.push({ start: startToday, end: endToday });
             });
 
-            // 判斷當下是否在某個特價時段內
             let activeEvent = events.find(e => now >= e.start && now < e.end);
             if (activeEvent) {
                 return { isActive: true, targetTime: activeEvent.end };
             }
 
-            // 若不在特價中，找尋下一個最近的開始時間
             let futureEvents = events.filter(e => e.start > now).sort((a, b) => a.start - b.start);
             if (futureEvents.length > 0) {
                 return { isActive: false, targetTime: futureEvents[0].start };
@@ -111,55 +118,64 @@
             return { isActive: false, targetTime: null };
         }
 
+        // 圖片載入失敗時的防破圖替換機制
+        function handleImageError(imgElement, storeName) {
+            const firstChar = storeName.substring(0, 1);
+            imgElement.outerHTML = `<div class="fallback-logo">${firstChar}</div>`;
+        }
+
         function renderGrid() {
             const grid = document.getElementById('store-grid');
             const now = new Date();
-            let htmlStr = '';
+            
+            // 只有在第一次載入時重繪整個 HTML，避免倒數計時閃爍與圖片重複請求
+            if (grid.innerHTML.trim() === '') {
+                let htmlStr = '';
+                stores.forEach((store, index) => {
+                    const timeText = store.times.map(t => {
+                        const format = h => `${Math.floor(h).toString().padStart(2,'0')}:${(Math.round((h%1)*60)).toString().padStart(2,'0')}`;
+                        return `${format(t.start)} - ${t.nextDay || t.end <= t.start ? '隔日' : ''}${format(t.end)}`;
+                    }).join(' & ');
 
-            stores.forEach(store => {
+                    htmlStr += `
+                        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between transition-transform hover:scale-[1.02]">
+                            <div class="flex items-center space-x-4 mb-2">
+                                <img src="${store.logo}" alt="${store.name} Logo" class="logo-img" onerror="handleImageError(this, '${store.name}')">
+                                <div class="flex-1">
+                                    <h2 class="text-2xl font-bold text-gray-800">${store.name}</h2>
+                                    <p class="text-sm text-gray-500 font-medium mt-1">時段：${timeText}</p>
+                                </div>
+                            </div>
+                            <div id="status-${index}"></div>
+                        </div>
+                    `;
+                });
+                grid.innerHTML = htmlStr;
+            }
+
+            // 單獨更新狀態區塊的倒數文字，提升效能並解決閃爍
+            stores.forEach((store, index) => {
                 const status = getStoreStatus(store, now);
-                let statusHtml = '';
+                const statusContainer = document.getElementById(`status-${index}`);
                 
                 if (status.isActive) {
                     let timeLeft = status.targetTime - now;
-                    statusHtml = `
+                    statusContainer.innerHTML = `
                         <div class="mt-4 px-4 py-3 bg-green-500 rounded-lg text-center shadow-inner">
                             <div class="font-bold text-xl neon-green">🟢 特價中！ (${store.discount})</div>
                             <div class="text-green-100 font-mono text-lg mt-1 tracking-wider">結束倒數 ${formatCountdown(timeLeft)}</div>
                         </div>`;
                 } else {
                     let timeLeft = status.targetTime - now;
-                    statusHtml = `
+                    statusContainer.innerHTML = `
                         <div class="mt-4 px-4 py-3 bg-gray-200 text-gray-600 rounded-lg text-center">
                             <div class="font-bold text-lg">🔴 尚未開始</div>
                             <div class="font-mono text-sm mt-1">開始倒數 ${formatCountdown(timeLeft)}</div>
                         </div>`;
                 }
-
-                // 顯示時段文字
-                const timeText = store.times.map(t => {
-                    const format = h => `${Math.floor(h).toString().padStart(2,'0')}:${(Math.round((h%1)*60)).toString().padStart(2,'0')}`;
-                    return `${format(t.start)} - ${t.nextDay || t.end <= t.start ? '隔日' : ''}${format(t.end)}`;
-                }).join(' & ');
-
-                // 預防圖片載入失敗，加入 onerror
-                htmlStr += `
-                    <div class="glass-card rounded-2xl p-5 flex flex-col justify-between transition-transform hover:scale-[1.02]">
-                        <div class="flex items-center space-x-4 mb-2">
-                            <img src="${store.logo}" alt="${store.name} Logo" class="logo-img" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'70\\' height=\\'70\\'><rect width=\\'70\\' height=\\'70\\' fill=\\'%23eee\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-size=\\'14\\'>Logo</text></svg>'">
-                            <div class="flex-1">
-                                <h2 class="text-2xl font-bold text-gray-800">${store.name}</h2>
-                                <p class="text-sm text-gray-500 font-medium mt-1">時段：${timeText}</p>
-                            </div>
-                        </div>
-                        ${statusHtml}
-                    </div>
-                `;
             });
-            grid.innerHTML = htmlStr;
         }
 
-        // 初始化並每秒更新
         renderGrid();
         setInterval(renderGrid, 1000);
     </script>
